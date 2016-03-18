@@ -38,7 +38,30 @@ BufMgr::BufMgr(std::uint32_t bufs)
 //Flushes out all dirty pages and deallocates the buffer pool and the BufDesc table.
 BufMgr::~BufMgr()
 {
+	BufDesc* bufdesc;
+	File * tmpfile;
+	Page * frame;
 
+	for (std::uint32_t i = 0; i < numBufs; i++)
+	{
+		bufdesc = &(bufDescTable[i]);
+		if(bufdesc->valid && bufdesc->dirty) {
+			//write frame from buffer onto disk
+			tmpfile = bufdesc->file;
+			frame = &(bufPool[bufdesc->frameNo]);
+			tmpfile->writePage(*frame);
+		}
+		//clear entry from BufDesc
+		bufdesc->Clear();
+	}
+	//deallocate BufDesc table
+	delete [] &bufDescTable;
+
+	//deallocates BufferPool
+	for(std::uint32_t i = 0; i < numBufs; i++) {
+		//guess there is no harm in leaving old information in pool
+	}
+	delete [] &bufPool;
 }
 
 
