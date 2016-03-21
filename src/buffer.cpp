@@ -101,7 +101,7 @@ void BufMgr::allocBuf(FrameId & frame)
 		{
 			foundbuffer= true;
 			//remove previous entry from the hashtable
-		
+			hashTable->remove(bufDescTable[clockHand].file, bufDescTable[clockHand].pageNo);
 		//if has bee referenced clear the bit
 		else
 		{
