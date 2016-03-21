@@ -81,7 +81,51 @@ void BufMgr::advanceClock()
 */
 void BufMgr::allocBuf(FrameId & frame) 
 {
-
+	std::uint32_t scannedNum= 0;
+	bool foundbuffer= false;
+	
+	while (scannedNum < numBufs)
+	{
+		scannedNum++;
+		//advance the clock
+		advanceClock();
+		
+		//check if buffer is valid (if already has file), if not use the buffer
+		if (!bufDescTable[clockhand].valid)
+		{
+			break;
+		}
+		
+		//check if refbit is set and if it is pinned. if has not been referenced and pincount is 0, use it
+		if (!bufDescTable[clockhand].refbit && bufDescTable[clockhand].pinCnt==0)
+		{
+			foundbuffer= true;
+			//remove previous entry from the hashtable
+		
+		//if has bee referenced clear the bit
+		else
+		{
+			bufDescTable[clockHand].refbit= false;
+		}
+	}
+	
+	if (!found && scannedNum > numBufs)
+	{
+		throw BufferExceededException();
+	}
+	
+	//flush the page to disk if dirty
+	if (bufDescTable[clockHand].dirty)
+	{
+		 bufDescTable[clockHand].file->writePage(bufDescTable[clockHand].pageNo, bufPool[clockHand]);
+		 bufDescTable[clockHand].dirty= false;
+	}
+	
+	//clear the buffer at the end
+	bufDescTable[clockHand].Clear();
+	
+	//set the frame to the clockhand
+	frame=clockHand;
 }
 
 
